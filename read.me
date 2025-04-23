@@ -1,0 +1,48 @@
+12 April 2023
+
+Nadia Smith
+nadias@stcnet.com
+
+IDL routines to demonstrate how to prepare CLIMCAPS for data assimilation
+and specifically CO.
+
+; CO a-priori values
+The CLIMCAPS Level 2 files do not have the CO a-priori listed as a field in V2.
+CLIMCAPS uses a simple climatoloty profile as CO a-priori; one profile for the 
+northern hemisphere and one for the southern hemisphere. This is also what NUCAPS
+at NOAA uses. This climatology was derived from MOPITT by Juying Warner. There
+are two NH/SH profiles for each month of the year. 
+
+Usually, CLIMCAPS reads the CO climatology file at run-time to generate a 
+space-time interpolated profile according to the date and latitude of the retrieval
+scene. 
+
+files of interest for calculating CO a-priori:
+(1) mopitt_v4clim_nhsh_20180605.dat
+(2) read_mopitt_v4clim_binary.pro
+(3) get_mopitt_v4clim.pro
+
+To generate a scene-specific CO a-priori profile, simply run #3 as follows:
+> get_mopitt_v4clim,datestr,alat,coprior
+
+where datestr is a string specifying the date as YYYYMMDD, alat is a floating-point
+value that specifies the latitude of the scene in question, and coprior is the output 
+profile in units [ppb]. 
+
+There is no longitudinal distinction in the CO a-priori. 
+
+; Averaging kernels
+CLIMCAPS reports AK matrices for each retrieval parameter at every field-of-regard. 
+The AKs are defined on coarse layers and have to be expanded to 100-layer 
+matrices before use. 
+
+The rountine that demonstrates how to expand the AKs and calculate the CO a-priori 
+for a target scene is run as follows:
+> prepare_clim_for_assimilation, fn, nfor, nscan, output
+
+where fn is the Level2 filename, nfor the index of the field-of-regard, 
+nscan the index of the scaneline and output is a data structure that contains
+all the relevant values. 
+
+
+
